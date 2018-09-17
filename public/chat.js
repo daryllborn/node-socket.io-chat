@@ -1,5 +1,5 @@
 // Make connection
-var socket = io.connect('http://localhost:4000');
+var socket = io.connect();
 
 // Query DOM
 var message = document.getElementById('message'),
@@ -8,6 +8,7 @@ var message = document.getElementById('message'),
       output = document.getElementById('output'),
       feedback = document.getElementById('feedback');
       userList = document.getElementById('user-list');
+      onlinelist = document.getElementById('list');
 
 // Emit events
 btn.addEventListener('click', function(){
@@ -23,7 +24,7 @@ message.addEventListener('keypress', function(){
         message: message.value,
         handle: handle.value
     });
-})
+});
 
 
 // Listen for events
@@ -36,6 +37,17 @@ socket.on('typing', function(data){
     feedback.innerHTML = '<p><em>' + data.handle + ' is typing a message: ' + data.message + ' </em></p>';
 });
 
-socket.on('online', function(data){
-    userList.innerHTML += '<p>' + data + '</p>';
-})
+socket.on('online', function(users){
+  var list = document.createElement('ul');
+
+  for (var i = 0; i < users.length; i++) {
+    // Create the list item:
+    var item = document.createElement('li');
+    // Set its contents:
+    item.appendChild(document.createTextNode(users[i]));
+    // Add it to the list:
+    list.appendChild(item);
+  }
+  onlinelist.innerHTML = "";
+  onlinelist.appendChild(list);
+});

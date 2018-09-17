@@ -13,22 +13,34 @@ var server = app.listen(port, function(){
 app.use(express.static('public'));
 
 // Socket setup & pass server
-var users = []
 
 var io = socket(server);
+
+var users = [];
+
 io.on('connection', (socket) => {
 
     console.log('made socket connection', socket.id);
+
+
 
     // Handle chat event
     socket.on('chat', function(data){
         // console.log(data);
         io.sockets.emit('chat', data);
+
         socket.username = data.handle;
-        io.sockets.emit('online', socket.username);
+        users.push(socket.username);
+        io.sockets.emit('online', users);
+        console.log(users);
     });
 
-    socket.on
+    socket.on('disconnect', function(){
+      var index = users.indexOf(socket.username);
+      if (index !== -1) users.splice(index, 1);
+      io.sockets.emit('online', users);
+      console.log(users)
+    })
 
     // Handle typing event
     socket.on('typing', function(data){
